@@ -2,6 +2,7 @@ var canvas = document.getElementById("cvs");
 var context = canvas.getContext('2d');
 var raf;
 var bulletsActive = [];
+var enemiesAcitve = [];
 
 var p1 = {
     x: .5,
@@ -38,13 +39,21 @@ var g1 = {
     }
 }
 
-class bullet {
+//class Enemy {
+//    constructor {
+//       this. x = 1;
+//  }
+
+//   collision
+//}
+
+class Bullet {
     constructor(x, y, facing) {
         this.x = x;
         this.y = y;
         this.facing = facing;
-        this.velocity = .1
-        this.radius = 5
+        this.velocity = .01;
+        this.radius = 10;
     }
 
     getX() {
@@ -64,15 +73,18 @@ class bullet {
     }
 
     move() {
-        // code here
+        if (this.facing = 'right') {
+            this.x += this.velocity;
+
+        } else {
+            this.x -= this.velocity;
+        }
     }
 
-
-
     draw() {
-        context.fillStyle = 'yellow';
+        context.fillStyle = 'black';
         context.beginPath()
-        context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, true);
+        context.arc(this.x * canvas.width, this.y * canvas.height, this.radius, 0, 2 * Math.PI, true);
         context.fill();
     }
 
@@ -86,23 +98,26 @@ document.addEventListener('keydown', function(e) {
     console.log(e.key);
     if (e.key === 'w') { //up
         p1.y -= p1.vy;
-    } else if (e.key === 'a') { // left
+    }
+    if (e.key === 'a') { // left
         p1.x -= p1.vx;
         g1.angle = Math.PI;
         p1.facing = 'left';
 
-    } else if (e.key === 's') { // down
+    }
+    if (e.key === 's') { // down
         p1.y += p1.vy;
 
-    } else if (e.key === 'd') { // right
+    }
+    if (e.key === 'd') { // right
         p1.x += p1.vx;
         p1.facing = 'right';
         g1.angle = 0;
     }
     if (e.key === ' ') {
         console.log(' here ');
-        const b1 = new bullet(p1.x, p1.y);
-        b1.draw();
+        const b1 = new Bullet(p1.x, p1.y, p1.facing);
+
         bulletsActive.push(b1);
 
     }
@@ -115,9 +130,15 @@ document.addEventListener('mousemove', function(e) {
 
 
 function draw() {
+    var timeStamp = Date.now();
     context.clearRect(0, 0, canvas.width, canvas.height);
     p1.draw();
     g1.draw();
+    bulletsActive.forEach(bullet => {
+        bullet.move();
+        bullet.draw();
+
+    });
     raf = window.requestAnimationFrame(draw);
 }
 
