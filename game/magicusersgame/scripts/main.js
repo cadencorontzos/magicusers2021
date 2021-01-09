@@ -39,15 +39,39 @@ var g1 = {
     }
 }
 
-//This is a push. I am pushing. Try pulling. 
 
-//class Enemy {
-//    constructor {
-//       this. x = 1;
-//  }
+class Enemy {
+    constructor() {
+        this.x = .1;
+        this.y = .1;
+        this.height = .1;
+        this.width = .1;
+    }
 
-//   collision
-//}
+    getX() {
+        return this.x;
+    }
+
+    getY() {
+        return this.y;
+    }
+
+    getWidth() {
+        return this.width;
+    }
+
+    getHeight() {
+        return this.height;
+    }
+
+    draw() {
+        context.fillStyle = this.color;
+        context.fillRect(this.x * canvas.width, this.y * canvas.height, this.width * canvas.width, this.height * canvas.height);
+    }
+
+
+
+}
 
 class Bullet {
     constructor(x, y, facing) {
@@ -55,7 +79,7 @@ class Bullet {
         this.y = y;
         this.facing = facing;
         this.velocity = .01;
-        this.radius = 10;
+        this.radius = 7;
     }
 
     getX() {
@@ -88,6 +112,27 @@ class Bullet {
         context.beginPath()
         context.arc(this.x * canvas.width, this.y * canvas.height, this.radius, 0, 2 * Math.PI, true);
         context.fill();
+    }
+
+    isTouchingEnemy() {
+        var enAct = [...enemiesAcitve];
+        //var adjuster = 0;
+        var wasTouching = false;
+        enAct.forEach((enemy, i) => {
+            startX = enemy.getX();
+            endX = startX + (enemy.getWidth() * canvas.width);
+            startY = enemy.getY();
+            endY = startY + (enemy.getHeight() * canvas.height);
+            if (this.x <= endX && this.x >= startX && this.y <= endY && this.y >= startY) {
+                wasTouching = true;
+                delete enemiesAcitve[i];
+
+            }
+
+        });
+
+        enemiesAcitve = [...enemiesAcitve];
+        return wasTouching;
     }
 
 }
@@ -136,7 +181,16 @@ function draw() {
     context.clearRect(0, 0, canvas.width, canvas.height);
     p1.draw();
     g1.draw();
+    var bA = [...bulletsActive];
+    bA.forEach((bullet, i) => {
+        if (bullet.isTouchingEnemy()) {
+            delete bulletsActive[i];
+        }
+
+    });
+    bulletsActive = [...bulletsActive];
     bulletsActive.forEach(bullet => {
+
         bullet.move();
         bullet.draw();
 
