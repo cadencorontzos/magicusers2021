@@ -286,7 +286,10 @@ canvas.addEventListener('mouseover', function(e) {
 
 function onResize() {
     console.log('resized');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+
+    canvas.width = 600;
+    canvas.height = 600;
+
+
     draw();
 }
