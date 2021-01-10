@@ -8,21 +8,63 @@ var oldTime = 0;
 var score = 0;
 
 
+class Player {
+    constructor() {
+        this.x = .5;
+        this.y = .666;
+        this.height = .1;
+        this.width = .1;
+        this.vx = .025;
+        this.vy = .025;
+        this.facing = 'right';
+        this.color = 'blue';
+    }
 
-var p1 = {
-    x: .5,
-    y: .666,
-    height: .1,
-    width: .1,
-    color: 'blue',
-    vx: .025,
-    vy: .025,
-    draw: function() {
+    getX() {
+        return this.x;
+    }
+
+    getY() {
+        return this.y;
+    }
+
+    getHeight() {
+        return this.height;
+    }
+
+    getWidth() {
+        return this.width;
+    }
+
+    isFacing() {
+        return this.facing;
+    }
+
+    move(direction) {
+        if (direction === 'up') {
+            this.y -= this.vy;
+        } else if (direction === 'down') {
+            this.y += this.vy;
+        } else if (direction === 'left') {
+            this.x -= this.vx;
+            this.facing = 'left';
+        } else {
+            this.x += this.vx;
+            this.facing = 'right';
+        }
+    }
+
+    draw() {
 
         context.fillStyle = this.color;
         context.fillRect(this.x * canvas.width, this.y * canvas.height, this.width * canvas.width, this.height * canvas.height);
+
     }
-};
+
+}
+
+var p1 = new Player;
+
 
 var g1 = {
     color: 'red',
@@ -32,8 +74,8 @@ var g1 = {
     draw: function() {
         context.lineWidth = 10;
         context.strokeStyle = this.color;
-        newX = p1.x * canvas.width;
-        newY = p1.y * canvas.height;
+        newX = p1.getX() * canvas.width;
+        newY = p1.getY() * canvas.height;
         endX = newX + this.length * Math.cos(this.angle);
         endY = newY - this.length * Math.sin(this.angle);
         context.beginPath();
@@ -108,7 +150,7 @@ class Bullet {
         this.y = y;
         this.facing = facing;
         this.velocity = .01;
-        this.radius = 7;
+        this.radius = 4;
     }
 
     //getters
@@ -167,7 +209,7 @@ class Bullet {
             }
 
         });
-
+        return false;
 
 
     }
@@ -180,27 +222,27 @@ onResize();
 
 document.addEventListener('keydown', function(e) {
     console.log(e.key);
-    if (e.key === 'w') { //up
-        p1.y -= p1.vy;
+    if (e.key === 'w' || e.key === 'W') { //up
+        p1.move('up');
     }
-    if (e.key === 'a') { // left
-        p1.x -= p1.vx;
+    if (e.key === 'a' || e.key === 'A') { // left
+        p1.move('left');
         g1.angle = Math.PI;
-        p1.facing = 'left';
+
 
     }
-    if (e.key === 's') { // down
-        p1.y += p1.vy;
+    if (e.key === 's' || e.key === 'S') { // down
+        p1.move('down')
 
     }
-    if (e.key === 'd') { // right
-        p1.x += p1.vx;
-        p1.facing = 'right';
+    if (e.key === 'd' || e.key === 'D') { // right
+        p1.move('right');
+
         g1.angle = 0;
     }
     if (e.key === ' ') {
 
-        const b1 = new Bullet(p1.x, p1.y, p1.facing);
+        const b1 = new Bullet(p1.getX(), p1.getY(), p1.isFacing());
 
         bulletsActive.push(b1);
 
@@ -221,13 +263,6 @@ function draw() {
     context.clearRect(0, 0, canvas.width, canvas.height);
     p1.draw();
     g1.draw();
-
-
-    context.fillStyle = 'pink';
-
-    context.font = '48px serif';
-
-    context.fillText(score, .5 * canvas.width, .2 * canvas.height);
 
     var timeStamp = Date.now();
     timeElapsed += (timeStamp - oldTime);
@@ -251,6 +286,7 @@ function draw() {
     for (i = 0; i < bulletsActive.length; i++) {
 
         if (bulletsActive[i - adjuster].isTouchingEnemy()) {
+
             console.log(bulletsActive);
             bulletsActive.splice(i - adjuster, 1);
             console.log(bulletsActive);
@@ -270,6 +306,11 @@ function draw() {
         enemy.draw();
         enemy.move();
     });
+
+    context.fillStyle = 'pink';
+    context.font = '48px serif';
+    context.fillText(score, .5 * canvas.width, .2 * canvas.height);
+
     raf = window.requestAnimationFrame(draw);
 }
 
