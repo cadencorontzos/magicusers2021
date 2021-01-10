@@ -99,7 +99,7 @@ class Bullet {
     }
 
     move() {
-        if (this.facing = 'right') {
+        if (this.facing === 'right') {
             this.x += this.velocity;
 
         } else {
@@ -162,7 +162,7 @@ document.addEventListener('keydown', function(e) {
         g1.angle = 0;
     }
     if (e.key === ' ') {
-        console.log(' here ');
+
         const b1 = new Bullet(p1.x, p1.y, p1.facing);
 
         bulletsActive.push(b1);
