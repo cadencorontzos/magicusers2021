@@ -3,6 +3,8 @@ var context = canvas.getContext('2d');
 var raf;
 var bulletsActive = [];
 var enemiesAcitve = [];
+var timeElapsed = 0;
+var oldTime = 0;
 
 var p1 = {
     x: .5,
@@ -41,11 +43,18 @@ var g1 = {
 
 
 class Enemy {
-    constructor() {
-        this.x = .1;
-        this.y = .1;
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
         this.height = .1;
         this.width = .1;
+        this.speed = .01;
+        if (x < .5) {
+            this.moving = 'right';
+        } else {
+            this.moving = 'left';
+        }
+        this.color = 'orange';
     }
 
     getX() {
@@ -69,6 +78,21 @@ class Enemy {
         context.fillRect(this.x * canvas.width, this.y * canvas.height, this.width * canvas.width, this.height * canvas.height);
     }
 
+    move() {
+        if (this.moving === 'right') {
+            this.x += this.speed;
+        } else {
+            this.x -= this.speed;
+        }
+
+        if (this.x < 0) {
+            this.moving = 'left';
+        }
+
+        if (this.x > 1) {
+            this.moving = 'right';
+        }
+    }
 
 
 }
@@ -115,24 +139,29 @@ class Bullet {
     }
 
     isTouchingEnemy() {
-        var enAct = [...enemiesAcitve];
-        //var adjuster = 0;
-        var wasTouching = false;
-        enAct.forEach((enemy, i) => {
-            startX = enemy.getX();
-            endX = startX + (enemy.getWidth() * canvas.width);
-            startY = enemy.getY();
-            endY = startY + (enemy.getHeight() * canvas.height);
-            if (this.x <= endX && this.x >= startX && this.y <= endY && this.y >= startY) {
-                wasTouching = true;
-                delete enemiesAcitve[i];
+
+
+
+        enemiesAcitve.forEach((enemy, i) => {
+            var X = this.x * canvas.width;
+            var Y = this.y * canvas.height;
+            var startX = enemy.getX() * canvas.width;
+            var endX = startX + (enemy.getWidth() * canvas.width);
+            var startY = enemy.getY() * canvas.height;
+            var endY = startY + (enemy.getHeight() * canvas.height);
+
+            if (X <= endX && X >= startX && Y <= endY && Y >= startY) {
+
+                enemiesAcitve.splice(i);
+                return true;
+
 
             }
 
         });
 
-        enemiesAcitve = [...enemiesAcitve];
-        return wasTouching;
+
+
     }
 
 }
@@ -177,26 +206,59 @@ document.addEventListener('mousemove', function(e) {
 
 
 function draw() {
-    var timeStamp = Date.now();
+
+
+
     context.clearRect(0, 0, canvas.width, canvas.height);
     p1.draw();
     g1.draw();
-    var bA = [...bulletsActive];
-    bA.forEach((bullet, i) => {
-        if (bullet.isTouchingEnemy()) {
-            delete bulletsActive[i];
+    // var bA = [...bulletsActive];
+    // console.log(bA);
+    var adjuster = 0;
+
+
+    var timeStamp = Date.now();
+    timeElapsed += (timeStamp - oldTime);
+    oldTime = timeStamp;
+
+    if (timeElapsed > 3000) {
+        var yloc = Math.random();
+        var xloc;
+        if (yloc > .5) {
+            xloc = .95;
+        } else {
+            xloc = -.05;
+        }
+        const enem = new Enemy(xloc, yloc);
+        enemiesAcitve.push(enem);
+        timeElapsed = 0;
+    }
+
+    bulletsActive.forEach((bullet, i) => {
+
+        if (bulletsActive[i - adjuster].isTouchingEnemy()) {
+            console.log(bulletsActive);
+            bulletsActive.splice(i - adjuster);
+            console.log(bulletsActive);
+            adjuster++;
         }
 
     });
-    bulletsActive = [...bulletsActive];
+
     bulletsActive.forEach(bullet => {
 
         bullet.move();
         bullet.draw();
 
     });
+
+    enemiesAcitve.forEach(enemy => {
+        enemy.draw();
+        enemy.move();
+    });
     raf = window.requestAnimationFrame(draw);
 }
+
 
 
 canvas.addEventListener('mouseover', function(e) {
