@@ -17,7 +17,7 @@ class Player {
         this.vx = .025;
         this.vy = .025;
         this.facing = 'right';
-        this.color = 'blue';
+        this.color = '#4169E1';
     }
 
     getX() {
@@ -67,7 +67,7 @@ var p1 = new Player;
 
 
 var g1 = {
-    color: 'red',
+    color: '',
     angle: 0,
     length: 50,
     facing: 'right',
@@ -99,7 +99,7 @@ class Enemy {
         } else {
             this.moving = 'left';
         }
-        this.color = 'orange';
+        this.color = '#B22222';
     }
 
     //getters
@@ -180,7 +180,7 @@ class Bullet {
     }
 
     draw() {
-        context.fillStyle = 'black';
+        context.fillStyle = '#DAA520';
         context.beginPath()
         context.arc(this.x * canvas.width, this.y * canvas.height, this.radius, 0, 2 * Math.PI, true);
         context.fill();
@@ -307,7 +307,7 @@ function draw() {
         enemy.move();
     });
 
-    context.fillStyle = 'pink';
+    context.fillStyle = 'white';
     context.font = '48px serif';
     context.fillText(score, .5 * canvas.width, .2 * canvas.height);
 
