@@ -223,6 +223,7 @@ function draw() {
     g1.draw();
 
 
+    context.fillStyle = 'pink';
 
     context.font = '48px serif';
 
