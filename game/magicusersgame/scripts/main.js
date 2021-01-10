@@ -15,8 +15,8 @@ var p1 = {
     height: .1,
     width: .1,
     color: 'blue',
-    vx: .05,
-    vy: .05,
+    vx: .025,
+    vy: .025,
     draw: function() {
 
         context.fillStyle = this.color;
