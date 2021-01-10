@@ -5,6 +5,7 @@ var bulletsActive = [];
 var enemiesAcitve = [];
 var timeElapsed = 0;
 var oldTime = 0;
+var score = 0;
 
 
 
@@ -159,6 +160,7 @@ class Bullet {
             if (X <= endX && X >= startX && Y <= endY && Y >= startY) {
 
                 enemiesAcitve.splice(i, 1);
+                score++;
                 return true;
 
 
@@ -215,12 +217,16 @@ function draw() {
 
 
 
+
     context.clearRect(0, 0, canvas.width, canvas.height);
     p1.draw();
     g1.draw();
 
     var adjuster = 0;
 
+    context.font = '48px serif';
+
+    context.fillText(score, .5 * canvas.width, .2 * canvas.height);
 
     var timeStamp = Date.now();
     timeElapsed += (timeStamp - oldTime);
@@ -228,14 +234,20 @@ function draw() {
 
     if (timeElapsed > 3000) {
         var yloc = Math.random();
-        var xloc;
+        var xloc = Math.random;
         if (yloc > .5) {
             xloc = .95;
         } else {
             xloc = -.05;
         }
+        var enem;
+        var topOrBottom = Math.random();
+        if (topOrBottom > .5) {
+            enem = new Enemy(xloc, yloc);
+        } else {
+            enem = new Enemy(yloc, xloc);
+        }
 
-        const enem = new Enemy(xloc, yloc);
         enemiesAcitve.push(enem);
         timeElapsed = 0;
     }
