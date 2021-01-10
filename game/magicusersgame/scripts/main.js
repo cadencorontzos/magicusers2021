@@ -6,6 +6,8 @@ var enemiesAcitve = [];
 var timeElapsed = 0;
 var oldTime = 0;
 
+
+
 var p1 = {
     x: .5,
     y: .666,
@@ -57,6 +59,7 @@ class Enemy {
         this.color = 'orange';
     }
 
+    //getters
     getX() {
         return this.x;
     }
@@ -73,6 +76,7 @@ class Enemy {
         return this.height;
     }
 
+    //methods
     draw() {
         context.fillStyle = this.color;
         context.fillRect(this.x * canvas.width, this.y * canvas.height, this.width * canvas.width, this.height * canvas.height);
@@ -106,6 +110,7 @@ class Bullet {
         this.radius = 7;
     }
 
+    //getters
     getX() {
         return this.x;
     }
@@ -138,6 +143,7 @@ class Bullet {
         context.fill();
     }
 
+    // checks if bullet is touching enemy. If so, that enemy is deleted and true value is reuturned
     isTouchingEnemy() {
 
 
@@ -212,8 +218,7 @@ function draw() {
     context.clearRect(0, 0, canvas.width, canvas.height);
     p1.draw();
     g1.draw();
-    // var bA = [...bulletsActive];
-    // console.log(bA);
+
     var adjuster = 0;
 
 
@@ -229,6 +234,7 @@ function draw() {
         } else {
             xloc = -.05;
         }
+
         const enem = new Enemy(xloc, yloc);
         enemiesAcitve.push(enem);
         timeElapsed = 0;
