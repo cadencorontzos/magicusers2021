@@ -48,7 +48,7 @@ class Enemy {
         this.y = y;
         this.height = .1;
         this.width = .1;
-        this.speed = .01;
+        this.speed = .001;
         if (x < .5) {
             this.moving = 'right';
         } else {
@@ -86,11 +86,11 @@ class Enemy {
         }
 
         if (this.x < 0) {
-            this.moving = 'left';
+            this.moving = 'right';
         }
 
         if (this.x > 1) {
-            this.moving = 'right';
+            this.moving = 'left';
         }
     }
 
