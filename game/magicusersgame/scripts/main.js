@@ -241,13 +241,7 @@ function draw() {
         } else {
             xloc = -.05;
         }
-        var enem;
-        var topOrBottom = Math.random();
-        if (topOrBottom > .5) {
-            enem = new Enemy(xloc, yloc);
-        } else {
-            enem = new Enemy(yloc, xloc);
-        }
+        const enem = new Enemy(xloc, yloc);
 
         enemiesAcitve.push(enem);
         timeElapsed = 0;
