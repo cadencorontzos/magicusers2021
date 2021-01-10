@@ -152,7 +152,7 @@ class Bullet {
 
             if (X <= endX && X >= startX && Y <= endY && Y >= startY) {
 
-                enemiesAcitve.splice(i);
+                enemiesAcitve.splice(i, 1);
                 return true;
 
 
@@ -245,6 +245,7 @@ function draw() {
 
     });
 
+    console.log(enemiesAcitve);
     bulletsActive.forEach(bullet => {
 
         bullet.move();
