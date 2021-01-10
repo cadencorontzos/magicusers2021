@@ -6,7 +6,8 @@ var enemiesAcitve = [];
 var timeElapsed = 0;
 var oldTime = 0;
 var score = 0;
-
+var playersActive = [];
+var socket = io()
 
 class Player {
     constructor() {
@@ -215,6 +216,7 @@ class Bullet {
     }
 
 }
+
 
 
 window.addEventListener('resize', onResize());

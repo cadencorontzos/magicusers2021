@@ -9,6 +9,8 @@ app.use(express.static(__dirname + '/public'));
 
 function onConnection(socket) {
     socket.on('playerMoved', (data) => socket.broadcast.emit('playerMoved', data));
+    socket.on('bulletFired', (data) => socket.broadcast.emit('bulletFired', data)):
 }
+
 
 http.listen(port, () => console.log('listening on port ' + port));
