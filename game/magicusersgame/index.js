@@ -7,5 +7,8 @@ const port = process.env.PORT || 80;
 
 app.use(express.static(__dirname + '/public'));
 
+function onConnection(socket) {
+    socket.on('playerMoved', (data) => socket.broadcast.emit('playerMoved', data));
+}
 
 http.listen(port, () => console.log('listening on port ' + port));
