@@ -223,12 +223,21 @@ function draw() {
 
     if (timeElapsed > 3000) {
         var yloc = Math.random();
-        var xloc;
+        var xloc = Math.random;
         if (yloc > .5) {
             xloc = .95;
         } else {
             xloc = -.05;
         }
+        if (xloc > .5) {
+            yloc = .95;
+        } else {
+            yloc = -.05;
+        }
+
+
+
+
         const enem = new Enemy(xloc, yloc);
         enemiesAcitve.push(enem);
         timeElapsed = 0;
