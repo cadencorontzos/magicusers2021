@@ -222,7 +222,7 @@ function draw() {
     p1.draw();
     g1.draw();
 
-    var adjuster = 0;
+
 
     context.font = '48px serif';
 
@@ -251,19 +251,19 @@ function draw() {
         enemiesAcitve.push(enem);
         timeElapsed = 0;
     }
+    var adjuster = 0;
 
-    bulletsActive.forEach((bullet, i) => {
+    for (i = 0; i < bulletsActive.length; i++) {
 
         if (bulletsActive[i - adjuster].isTouchingEnemy()) {
             console.log(bulletsActive);
-            bulletsActive.splice(i - adjuster);
+            bulletsActive.splice(i - adjuster, 1);
             console.log(bulletsActive);
             adjuster++;
         }
 
-    });
+    }
 
-    console.log(enemiesAcitve);
     bulletsActive.forEach(bullet => {
 
         bullet.move();
