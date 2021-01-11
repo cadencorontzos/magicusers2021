@@ -1,3 +1,5 @@
+
+
 var canvas = document.getElementById("cvs");
 var context = canvas.getContext('2d');
 var raf;
@@ -40,6 +42,10 @@ class Player {
             }
         }
     }
+
+
+
+
 
     getX() {
         return this.x;

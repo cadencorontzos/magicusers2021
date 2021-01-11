@@ -90,6 +90,16 @@ class Player {
 
     }
 
+    isTouchingEnemy() {
+
+
+        
+
+
+         
+
+    }    
+
 }
 
 

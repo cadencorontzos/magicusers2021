@@ -13,6 +13,16 @@
     <canvas id='cvs' height="300" width="300"></canvas>
     <script src="main.js"></script>
 
+
+    <script>
+        function reloadPage() {
+            setTimeout(function () {
+                location.reload();
+            }, 100)
+        }
+    </script>
+    <form onsubmit="reloadPage()" method="post" action="http://localhost:8080/person/reload/">
+                            <input type="submit" value="reloadPage"></form>
 </body>
 
 </html>
