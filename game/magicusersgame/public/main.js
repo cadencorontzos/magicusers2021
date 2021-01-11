@@ -6,12 +6,13 @@ var enemiesAcitve = [];
 var timeElapsed = 0;
 var oldTime = 0;
 var score = 0;
-var playersActive = [];
-var socket = io()
+var players = {};
+var socket = io();
 
 class Player {
-    constructor() {
+    constructor(id) {
         this.x = .5;
+        this.id = id;
         this.y = .666;
         this.height = .1;
         this.width = .1;
@@ -19,6 +20,25 @@ class Player {
         this.vy = .025;
         this.facing = 'right';
         this.color = '#4169E1';
+        this.g = {
+            color: '',
+            angle: 0,
+            length: 50,
+            facing: 'right',
+            draw: function() {
+                context.lineWidth = 10;
+                context.strokeStyle = this.color;
+                var newX = p1.getX() * canvas.width;
+                var newY = p1.getY() * canvas.height;
+                var endX = newX + this.length * Math.cos(this.angle);
+                var endY = newY - this.length * Math.sin(this.angle);
+                context.beginPath();
+                context.moveTo(newX, newY);
+                context.lineTo(endX, endY);
+                context.stroke();
+
+            }
+        }
     }
 
     getX() {
@@ -31,6 +51,10 @@ class Player {
 
     getHeight() {
         return this.height;
+    }
+
+    g1(a) {
+        this.g.angle = a;
     }
 
     getWidth() {
@@ -64,28 +88,9 @@ class Player {
 
 }
 
-var p1 = new Player;
 
 
-var g1 = {
-    color: '',
-    angle: 0,
-    length: 50,
-    facing: 'right',
-    draw: function() {
-        context.lineWidth = 10;
-        context.strokeStyle = this.color;
-        newX = p1.getX() * canvas.width;
-        newY = p1.getY() * canvas.height;
-        endX = newX + this.length * Math.cos(this.angle);
-        endY = newY - this.length * Math.sin(this.angle);
-        context.beginPath();
-        context.moveTo(newX, newY);
-        context.lineTo(endX, endY);
-        context.stroke();
 
-    }
-}
 
 
 class Enemy {
@@ -217,45 +222,99 @@ class Bullet {
 
 }
 
+function drawEnemy(e) {
+    context.fillStyle = e.color;
+    context.fillRect(e.x * canvas.width, e.y * canvas.height, e.width * canvas.width, e.height * canvas.height);
+}
 
+function moveEnemy(e) {
+    if (e.moving === 'right') {
+        e.x += e.speed;
+    } else {
+        e.x -= e.speed;
+    }
+
+    if (e.x < 0) {
+        e.moving = 'right';
+    }
+
+    if (e.x > 1) {
+        e.moving = 'left';
+    }
+}
+
+function drawBullet(b) {
+    context.fillStyle = '#DAA520';
+    context.beginPath()
+    context.arc(b.x * canvas.width, b.y * canvas.height, b.radius, 0, 2 * Math.PI, true);
+    context.fill();
+}
+
+function moveBullet(b) {
+
+
+    if (b.facing === 'right') {
+        b.x += b.velocity;
+
+    } else {
+        b.x -= b.velocity;
+    }
+    socket.emit('bulletMoved', bulletsActive);
+
+}
+
+function drawPlayer(p) {
+
+    context.fillStyle = p.color;
+    context.fillRect(p.x * canvas.width, p.y * canvas.height, p.width * canvas.width, p.height * canvas.height);
+    drawGun(p.g, p.x, p.y);
+}
+
+function drawGun(g, x, y) {
+    context.lineWidth = 10;
+    context.strokeStyle = g.color;
+    var newX = x * canvas.width;
+    var newY = y * canvas.height;
+    var endX = newX + g.length * Math.cos(g.angle);
+    var endY = newY - g.length * Math.sin(g.angle);
+    context.beginPath();
+    context.moveTo(newX, newY);
+    context.lineTo(endX, endY);
+    context.stroke();
+
+}
 
 window.addEventListener('resize', onResize());
 onResize();
 
 document.addEventListener('keydown', function(e) {
-    console.log(e.key);
-    if (e.key === 'w' || e.key === 'W') { //up
-        p1.move('up');
-    }
-    if (e.key === 'a' || e.key === 'A') { // left
-        p1.move('left');
-        g1.angle = Math.PI;
-
-
-    }
-    if (e.key === 's' || e.key === 'S') { // down
-        p1.move('down')
-
-    }
-    if (e.key === 'd' || e.key === 'D') { // right
-        p1.move('right');
-
-        g1.angle = 0;
-    }
-    if (e.key === ' ') {
-
-        const b1 = new Bullet(p1.getX(), p1.getY(), p1.isFacing());
-
-        bulletsActive.push(b1);
-
-    }
+    socket.emit('keyPressed', e.key);
 });
 
-document.addEventListener('mousemove', function(e) {
-    // code here
+socket.emit('addplayer');
+
+socket.on('playersUpdated', function(p) {
+    players = p;
+});
+
+socket.on('updatedPositions', function(p) {
+    console.log('positions were updated');
+    players = p;
 
 });
 
+socket.on('scoreUpdate', function(s) {
+    console.log(score);
+    score = s;
+});
+
+socket.on('upDatedBullets', function(b) {
+    bulletsActive = [...b];
+})
+
+socket.on('enemiesUpdated', function(e) {
+    enemiesAcitve = [...e];
+});
 
 function draw() {
 
@@ -263,52 +322,23 @@ function draw() {
 
 
     context.clearRect(0, 0, canvas.width, canvas.height);
-    p1.draw();
-    g1.draw();
 
-    var timeStamp = Date.now();
-    timeElapsed += (timeStamp - oldTime);
-    oldTime = timeStamp;
+    for (var player in players) {
 
-    if (timeElapsed > 3000) {
-        var yloc = Math.random();
-        var xloc = Math.random;
-        if (yloc > .5) {
-            xloc = .95;
-        } else {
-            xloc = -.05;
-        }
-        const enem = new Enemy(xloc, yloc);
-
-        enemiesAcitve.push(enem);
-        timeElapsed = 0;
+        drawPlayer(players[player]);
     }
-    var adjuster = 0;
 
-    for (i = 0; i < bulletsActive.length; i++) {
+    enemiesAcitve.forEach(enemy => {
+        drawEnemy(enemy);
 
-        if (bulletsActive[i - adjuster].isTouchingEnemy()) {
+    });
 
-            console.log(bulletsActive);
-            bulletsActive.splice(i - adjuster, 1);
-            console.log(bulletsActive);
-            adjuster++;
-        }
-
-    }
 
     bulletsActive.forEach(bullet => {
 
-        bullet.move();
-        bullet.draw();
+        drawBullet(bullet);
 
     });
-
-    enemiesAcitve.forEach(enemy => {
-        enemy.draw();
-        enemy.move();
-    });
-
     context.fillStyle = 'white';
     context.font = '48px serif';
     context.fillText(score, .5 * canvas.width, .2 * canvas.height);
@@ -323,7 +353,7 @@ canvas.addEventListener('mouseover', function(e) {
 });
 
 function onResize() {
-    console.log('resized');
+
 
     canvas.width = 600;
     canvas.height = 600;
