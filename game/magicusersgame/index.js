@@ -4,14 +4,13 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const port = process.env.PORT || 80;
 var players = {};
-var numPlayers = 0;
 bulletsActive = [];
 enemiesAcitve = [];
 app.use(express.static(__dirname + '/public'));
 var oldTime = 0;
 var timeElapsed = 0;
 var score = 0;
-
+var colors = ['blue', 'pink', 'orange', 'yellow', 'violet', 'purple', 'chartruse', 'purple', 'coral', 'hotpink', 'khaki', 'aqua']
 
 class Player {
     constructor(id) {
@@ -23,7 +22,7 @@ class Player {
         this.vx = .025;
         this.vy = .025;
         this.facing = 'right';
-        this.color = '#4169E1';
+        this.color = colors[Math.floor(Math.random() * colors.length)];
         this.g = {
             color: '',
             angle: 0,
@@ -81,6 +80,26 @@ class Player {
             this.x += this.vx;
             this.facing = 'right';
         }
+    }
+
+    isTouchingEnemy(e) {
+
+        var Ex = e.getX() * 600;
+        var Ey = e.getY() * 600;
+        var size = 60;
+
+        var trc = { x: Ex + size, y: Ey };
+        var tlc = { x: Ex, y: Ey };
+        var blc = { x: Ex, y: Ey + size };
+        var brc = { x: Ex + size, y: Ey + size };
+
+        var corners = [trc, tlc, blc, brc];
+
+
+
+
+        return corners.find(corner => isInside(this, corner));
+
     }
 
     draw() {
@@ -214,7 +233,7 @@ class Bullet {
 
                 enemiesAcitve.splice(i, 1);
                 score++;
-                console.log('in istouch and score is :' + score);
+
                 return true;
 
 
@@ -228,8 +247,26 @@ class Bullet {
 
 }
 
+function size_dict(d) { c = 0; for (i in d) ++c; return c }
 
 
+function isInside(p, corner) {
+    var X = corner.x;
+    var Y = corner.y;
+    var startX = p.getX() * 600;
+    var endX = startX + (p.getWidth() * 600);
+    var startY = p.getY() * 600;
+    var endY = startY + (p.getHeight() * 600);
+
+
+
+    if (X <= endX && X >= startX && Y <= endY && Y >= startY) {
+
+        return true;
+
+    }
+    return false;
+}
 
 function onConnection(socket) {
     var playerGotAdded = false;
@@ -257,7 +294,30 @@ function onConnection(socket) {
     function moveEnemiesAndBullets() {
         enemiesAcitve.forEach(enemy => {
             enemy.move();
+            for (var player in players) {
+
+                if (players[player].isTouchingEnemy(enemy)) {
+                    delete players[player];
+
+
+                    socket.emit('playersUpdated', players);
+                    socket.emit('died', socket.id);
+                }
+            }
         });
+
+        if (size_dict(players) === 0 && playerGotAdded) {
+            playerGotAdded = false;
+            enemiesAcitve = [];
+            socket.emit('enemiesUpdated', enemiesAcitve);
+            clearInterval(mover);
+            clearInterval(generator);
+            socket.emit('lost');
+            score = 0;
+            bulletsActive = [];
+
+        }
+
         socket.emit('enemiesUpdated', enemiesAcitve);
         socket.emit('scoreUpdate', score);
         bulletsActive.forEach((b, i) => {
@@ -267,18 +327,20 @@ function onConnection(socket) {
             }
 
             if (b.isTouchingEnemy()) {
-                console.log(score);
+
                 socket.emit('scoreUpdate', score);
                 bulletsActive.splice(i, 1);
             }
 
         });
 
+
+
         socket.emit('upDatedBullets', bulletsActive);
     }
 
-    setInterval(moveEnemiesAndBullets, 30);
-    setInterval(generateEnemies, 5000);
+    var mover = setInterval(moveEnemiesAndBullets, 30);
+    var generator = setInterval(generateEnemies, 6000);
 
     // for (var i = 0; i < bulletsActive.length; i++) {
 
@@ -295,7 +357,6 @@ function onConnection(socket) {
     socket.on('addplayer', function() {
         const p1 = new Player(socket.id);
         players[socket.id] = p1;
-        numPlayers++;
         socket.emit('playersUpdated', players);
         playerGotAdded = true;
     });
@@ -308,7 +369,9 @@ function onConnection(socket) {
 
 
     socket.on('keyPressed', function(key) {
-
+        if (!players[socket.id]) {
+            return;
+        }
         if (key === 'w' || key === 'W') { //up
             players[socket.id].move('up');
         }
@@ -344,8 +407,12 @@ function onConnection(socket) {
     socket.on('disconnect', function() {
         if (playerGotAdded) {
             delete players[socket.id];
+
+            playerGotAdded = false;
         }
         socket.emit('playersUpdated', players);
+
+
     });
 }
 
