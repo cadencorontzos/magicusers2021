@@ -84,9 +84,9 @@ class Player {
 
     isTouchingEnemy(e) {
 
-        var Ex = e.getX() * 600;
-        var Ey = e.getY() * 600;
-        var size = 60;
+        var Ex = e.getX();
+        var Ey = e.getY();
+        var size = .1;
 
         var trc = { x: Ex + size, y: Ey };
         var tlc = { x: Ex, y: Ey };
@@ -222,12 +222,12 @@ class Bullet {
 
 
         enemiesAcitve.forEach((enemy, i) => {
-            var X = this.x * 600;
-            var Y = this.y * 600;
-            var startX = enemy.getX() * 600;
-            var endX = startX + (enemy.getWidth() * 600);
-            var startY = enemy.getY() * 600;
-            var endY = startY + (enemy.getHeight() * 600);
+            var X = this.x;
+            var Y = this.y;
+            var startX = enemy.getX();
+            var endX = startX + (enemy.getWidth());
+            var startY = enemy.getY();
+            var endY = startY + (enemy.getHeight());
 
             if (X <= endX && X >= startX && Y <= endY && Y >= startY) {
 
@@ -253,10 +253,10 @@ function size_dict(d) { c = 0; for (i in d) ++c; return c }
 function isInside(p, corner) {
     var X = corner.x;
     var Y = corner.y;
-    var startX = p.getX() * 600;
-    var endX = startX + (p.getWidth() * 600);
-    var startY = p.getY() * 600;
-    var endY = startY + (p.getHeight() * 600);
+    var startX = p.getX();
+    var endX = startX + (p.getWidth());
+    var startY = p.getY();
+    var endY = startY + (p.getHeight());
 
 
 

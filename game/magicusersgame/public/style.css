@@ -4,8 +4,8 @@ canvas {
 }
 
 h1 {
-    text-align: 'right';
-    position: 'relative';
+    text-align: 'center';
+    position: 'absolute';
     z-index: 5000;
     text-decoration: underline;
 }
