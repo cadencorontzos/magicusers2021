@@ -3,6 +3,9 @@ canvas {
     border: 1px solid black;
 }
 
+
+/* title */
+
 h1 {
     text-align: 'center';
     position: 'absolute';

@@ -9,6 +9,7 @@ var score = 0;
 var players = {};
 var socket = io();
 
+// functions for drawing and moving enemy/ player
 
 function drawEnemy(e) {
     context.fillStyle = e.color;
@@ -119,29 +120,32 @@ socket.on('died', function(i) {
 
 })
 
+//draws each frame
 function draw() {
-
-
-
-
     context.clearRect(0, 0, canvas.width, canvas.height);
 
+    //draws players
     for (var player in players) {
 
         drawPlayer(players[player]);
     }
 
+    //draws the enemies
     enemiesAcitve.forEach(enemy => {
         drawEnemy(enemy);
 
     });
 
 
+    //draw all the bullets
     bulletsActive.forEach(bullet => {
 
         drawBullet(bullet);
 
     });
+
+
+    // draws the score
     context.fillStyle = 'white';
     context.font = '48px serif';
     context.fillText(score, .5 * canvas.width, .2 * canvas.height);
@@ -150,7 +154,7 @@ function draw() {
 }
 
 
-
+//requests new frames
 canvas.addEventListener('mouseover', function(e) {
     raf = window.requestAnimationFrame(draw);
 });

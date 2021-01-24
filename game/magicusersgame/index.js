@@ -12,6 +12,7 @@ var timeElapsed = 0;
 var score = 0;
 var colors = ['blue', 'pink', 'orange', 'yellow', 'violet', 'purple', 'chartruse', 'purple', 'coral', 'hotpink', 'khaki', 'aqua']
 
+//player class
 class Player {
     constructor(id) {
         this.x = .5;
@@ -102,12 +103,6 @@ class Player {
 
     }
 
-    draw() {
-
-        context.fillStyle = this.color;
-        context.fillRect(this.x * canvas.width, this.y * canvas.height, this.width * canvas.width, this.height * canvas.height);
-
-    }
 
 
 }
@@ -116,7 +111,7 @@ class Player {
 
 
 
-
+// enemy class
 class Enemy {
     constructor(x, y) {
         this.x = x;
@@ -150,10 +145,7 @@ class Enemy {
     }
 
     //methods
-    draw() {
-        context.fillStyle = this.color;
-        context.fillRect(this.x * canvas.width, this.y * canvas.height, this.width * canvas.width, this.height * canvas.height);
-    }
+
 
     move() {
         if (this.moving === 'right') {
@@ -209,12 +201,6 @@ class Bullet {
         }
     }
 
-    draw() {
-        context.fillStyle = '#DAA520';
-        context.beginPath()
-        context.arc(this.x * canvas.width, this.y * canvas.height, this.radius, 0, 2 * Math.PI, true);
-        context.fill();
-    }
 
     // checks if bullet is touching enemy. If so, that enemy is deleted and true value is reuturned
     isTouchingEnemy() {
@@ -249,7 +235,7 @@ class Bullet {
 
 function size_dict(d) { c = 0; for (i in d) ++c; return c }
 
-
+// checks if a corner of the enemy is touching the player
 function isInside(p, corner) {
     var X = corner.x;
     var Y = corner.y;
@@ -267,6 +253,7 @@ function isInside(p, corner) {
     }
     return false;
 }
+
 
 function onConnection(socket) {
     var playerGotAdded = false;
@@ -339,21 +326,11 @@ function onConnection(socket) {
         socket.emit('upDatedBullets', bulletsActive);
     }
 
+    // move and generate enemeies
     var mover = setInterval(moveEnemiesAndBullets, 30);
     var generator = setInterval(generateEnemies, 6000);
 
-    // for (var i = 0; i < bulletsActive.length; i++) {
-
-    //     if (bulletsActive[i - adjuster].isTouchingEnemy()) {
-
-    //         console.log(bulletsActive);
-    //         bulletsActive.splice(i - adjuster, 1);
-    //         console.log(bulletsActive);
-    //         adjuster++;
-    //     }
-
-    // }
-
+    //socket functions
     socket.on('addplayer', function() {
         const p1 = new Player(socket.id);
         players[socket.id] = p1;
